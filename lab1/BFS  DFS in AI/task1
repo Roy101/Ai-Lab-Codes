@@ -1,0 +1,53 @@
+input = open('input_Task1.txt')
+lines = input.readlines()
+num_of_nodes = int(lines.pop(0)) import numpy as np
+adj_mtx = np.zeros((num_of_nodes, num_of_nodes), dtype=int)
+# Adjacency Matrix
+num_of_edge = int(lines.pop(0)) 
+goal_node = int(lines.pop(num_of_edge))
+for line in lines:
+  line = line.strip()
+  node = line.split(' ') 
+  adj_mtx[int(node[0]),int(node[1])] = 1
+  adj_mtx[int(node[1]),int(node[0])] = 1
+# Adjacency Matrix 
+# Adjacency (Matrix to List) conversion
+from collections import defaultdict
+def convert(a_m):
+    adjList = defaultdict(list) 
+    for i in range(len(a_m)):
+        for j in range(len(a_m[i])):
+                       if a_m[i][j]== 1:
+                           adjList[i].append(j) 
+    return adjList
+ 
+adj_List = convert(adj_mtx)   
+from queue import Queue
+ 
+visited = {} 
+lvl = {} 
+prnt = {} 
+bfs_out = [] 
+queue = Queue()
+ 
+for node in adj_List.keys():
+  visited[node] = False
+  prnt[node] = None
+  lvl[node] = -1
+ 
+s = 0
+visited[s] = True
+lvl[s] = 0
+queue.put(s)
+ 
+while not queue.empty():
+  u = queue.get()
+  bfs_out.append(u)
+ 
+  for v in adj_List[u]:
+    if not visited[v]:
+      visited[v] = True
+      prnt[v] = u
+      lvl[v] = lvl[u]+1
+      queue.put(v) 
+print("Minimum number of moves Nora needs:",lvl[goal_node])

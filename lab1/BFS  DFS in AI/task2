@@ -1,0 +1,73 @@
+input = open(' input_Task2.txt')
+lines = input.readlines()
+num_of_nodes = int(lines.pop(0))
+ 
+ 
+import numpy as np
+am = np.zeros((num_of_nodes, num_of_nodes), dtype=int)
+# Adjacency Matrix
+ 
+num_of_edge = int(lines.pop(0)) 
+xp = int(lines.pop(num_of_edge)) 
+pp = int(lines.pop(num_of_edge)) 
+qp = int(lines.pop(num_of_edge)) 
+ 
+ 
+for line in lines:
+  line = line.strip()
+  node = line.split(' ') # Split all Node
+  am[int(node[0]),int(node[1])] = 1
+  am[int(node[1]),int(node[0])] = 1
+# Adjacency Matrix
+# Adjacency (Matrix to List) conversion
+from collections import defaultdict 
+ 
+def convert(a_m):
+    adjList = defaultdict(list) 
+    for i in range(len(a_m)):
+        for j in range(len(a_m[i])):
+                       if a_m[i][j] == 1:
+                           adjList[i].append(j) 
+    return adjList 
+ 
+al = convert(am) 
+ 
+from queue import Queue
+def bfs(al, position):
+  visited = {} 
+  lvl = {} 
+  prnt = {} 
+  bfs_out = []
+  queue = Queue()
+ 
+  for node in al.keys():
+    visited[node] = False
+    prnt[node] = None
+    lvl[node] = -1
+ 
+  s = position
+  visited[s] = True
+  lvl[s] = 0
+  queue.put(s)
+ 
+  while not queue.empty():
+    u = queue.get()
+    bfs_out.append(u)
+ 
+    for v in al[u]:
+      if not visited[v]:
+        visited[v] = True
+        prnt[v] = u
+        lvl[v] = lvl[u]+1
+        queue.put(v)
+  return (lvl[xp])
+ 
+a = bfs(al, qp)
+b = bfs(al, pp)
+ 
+if a<b:
+  print ("Lara")
+elif b<a:
+  print ("Nora")
+else:
+  print ("Both")

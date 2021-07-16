@@ -1,0 +1,91 @@
+import random
+
+def random_chrmsm(size):  # we are making random chrmsms in this function
+    return [random.randint(1, size) for _ in range(size)]
+
+def fitness(chrmsm):
+    horizontal_collisions = sum([chrmsm.count(queen) - 1 for queen in chrmsm]) / 2
+    n = len(chrmsm)
+    left_diagonal = [0] * 2 * n
+    right_diagonal = [0] * 2 * n
+    for i in range(n):
+        left_diagonal[i + chrmsm[i] - 1] += 1
+        right_diagonal[len(chrmsm) - i + chrmsm[i] - 2] += 1
+
+    diagonal_collisions = 0
+    for i in range(2 * n - 1):
+        counter = 0
+        if left_diagonal[i] > 1:
+            counter += left_diagonal[i] - 1
+        if right_diagonal[i] > 1:
+            counter += right_diagonal[i] - 1
+        diagonal_collisions += counter / (n - abs(i - n + 1))
+
+    return int(maxFitness - (horizontal_collisions + diagonal_collisions))  # 28-(2+3)=23
+
+
+def probability(chrmsm, fitness):
+    return fitness(chrmsm) / maxFitness
+
+
+def random_pick(population, probabilities):
+    populationWithProbabilty = zip(population, probabilities)
+    total = sum(w for c, w in populationWithProbabilty)
+    r = random.uniform(0, total)
+    upto = 0
+    for c, w in zip(population, probabilities):
+        if upto + w >= r:
+            return c
+        upto += w
+    assert False, "Shouldn't get here"
+
+def mutate(x):  # randomly changing the value of a random index of a chrmosome
+    n = len(x)
+    c = random.randint(0, n - 1)
+    m = random.randint(1, n)
+    x[c] = m
+    return x
+
+
+def reproduce(x, y):  # doing cross_over between two chromosomes
+    n = len(x)
+    c = random.randint(0, n - 1)
+    return x[0:c] + y[c:n]
+
+def genetic_queen(population, fitness):
+    mutation_probability = 0.03
+    updated = []
+    probabilities = [probability(n, fitness) for n in population]
+    for i in range(len(population)):
+        x = random_pick(population, probabilities)  # best chromosome 1
+        y = random_pick(population, probabilities)  # best chromosome 2
+        child = reproduce(x, y)  # creating two new chromosomes from the best 2 chromosomes
+        if random.random() < mutation_probability:
+            child = mutate(child)
+        # print_chrmsm(child)
+        updated.append(child)
+        if fitness(child) == maxFitness: break
+    return updated
+
+nqn = 8
+maxFitness = (nqn * (nqn - 1)) / 2  # 8*7/2 = 28
+population = [random_chrmsm(nqn) for _ in range(50)]
+
+generation = 1
+
+while not maxFitness in [fitness(chrom) for chrom in population]:
+
+    population = genetic_queen(population, fitness)
+
+    generation += 1
+chrom_out = []
+print("Solved in Generation {}!".format(generation - 1))
+for chrom in population:
+    if fitness(chrom) == maxFitness:
+
+        print("One of the solutions: ")
+        chrom_out = chrom
+
+for child in population:
+    if fitness(child) == maxFitness:
+        print("Result = {} ".format(str(child)))
